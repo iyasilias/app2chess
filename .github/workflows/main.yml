@@ -1,0 +1,53 @@
+# This workflow uses actions that are not certified by GitHub.
+# They are provided by a third-party and are governed by
+# separate terms of service, privacy policy, and support
+# documentation.
+
+name: FlutterFlow CI
+
+on:
+  push:
+    branches:
+      - flutterflow
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      # - uses: dart-lang/setup-dart@9a04e6d73cca37bd455e0608d7e5092f881fd603
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+      - run: flutter pub add build_runner
+      - name: 'Run flutter pub get'
+        run: flutter pub get
+      - name: 'Run Build'
+        run: flutter packages pub run build_runner build --delete-conflicting-outputs
+      - name: Enable flutter web
+        run: flutter config --enable-web
+      - name: 'Build Web App'
+        run: flutter build web
+        
+      - name: Archive Production Artifact
+        uses: actions/upload-artifact@master
+        with:
+         name: web-build
+         path: build/web
+         
+      # - uses: actions/checkout@v3
+
+      # - uses: actions/download-artifact@v3
+      #  with:
+      #    name: web-build
+
+      # - name: Display structure of downloaded files
+      #  run: ls -R
+        
+      - name: 📂 Sync folders and files to the server
+        uses: SamKirkland/FTP-Deploy-Action@4.3.3
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          local-dir: ./build/web/
+          server-dir: ./public_html/
