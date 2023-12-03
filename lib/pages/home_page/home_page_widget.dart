@@ -66,7 +66,10 @@ class _HomePageWidgetState extends State<HomePageWidget>
             children: [
               Text(
                 'chess.my',
-                style: FlutterFlowTheme.of(context).headlineSmall,
+                style: FlutterFlowTheme.of(context).headlineSmall.override(
+                      fontFamily: 'Outfit',
+                      fontWeight: FontWeight.bold,
+                    ),
               ),
               InkWell(
                 splashColor: Colors.transparent,
